@@ -1,0 +1,129 @@
+﻿@model PATTERNS.Models.BookingViewModel
+@using PATTERNS.Domain
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f5efe6, #e8dccb);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .booking-card {
+        max-width: 650px;
+        margin: 60px auto;
+        padding: 40px;
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #5c4633;
+        font-weight: 600;
+    }
+
+    label {
+        font-weight: 500;
+        color: #6e5a46;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    select, input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #d6c7b7;
+        background-color: #fdfaf6;
+        transition: 0.3s;
+    }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #b89b7a;
+            box-shadow: 0 0 6px rgba(184,155,122,0.4);
+        }
+
+    .form-group {
+        margin-top: 15px;
+    }
+
+    .book-btn {
+        width: 100%;
+        padding: 12px;
+        margin-top: 25px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #b89b7a, #8d6e54);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .book-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+    .error-box {
+        padding: 15px;
+        border-radius: 10px;
+        background-color: #fbeaea;
+        border: 1px solid #d88;
+        margin-bottom: 20px;
+        color: #7a1f1f;
+    }
+</style>
+
+<div class="booking-card">
+
+    <h2>Luxury Hotel Booking</h2>
+
+    @if (ViewBag.ErrorBody != null)
+    {
+        <div class="error-box">
+            <strong>@ViewBag.ErrorTitle</strong><br />
+            @ViewBag.ErrorBody
+        </div>
+    }
+
+    <form asp-action="Index" method="post">
+
+        <div class="form-group">
+            <label>Hotel</label>
+            <select asp-for="HotelId" asp-items="Model.Hotels"></select>
+        </div>
+
+        <div class="form-group">
+            <label>Room Type</label>
+            <select asp-for="RoomType" asp-items="Html.GetEnumSelectList<RoomType>()"></select>
+        </div>
+
+        <div class="form-group">
+            <label>Check-In</label>
+            <input asp-for="CheckIn" type="date" />
+        </div>
+
+        <div class="form-group">
+            <label>Check-Out</label>
+            <input asp-for="CheckOut" type="date" />
+        </div>
+
+        <div class="form-group">
+            <label>Guests</label>
+            <input asp-for="Guests" type="number" min="1" />
+        </div>
+
+        <div class="form-group">
+            <label>Payment</label>
+            <select asp-for="PaymentType" asp-items="Model.PaymentTypes"></select>
+        </div>
+
+        <button type="submit" class="book-btn">Book Now</button>
+
+    </form>
+</div>

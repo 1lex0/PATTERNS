@@ -1,0 +1,85 @@
+﻿@model PATTERNS.Domain.Booking
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f5efe6, #e8dccb);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .result-card {
+        max-width: 700px;
+        margin: 60px auto;
+        padding: 40px;
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+        text-align: center;
+        color: #5c4633;
+        margin-bottom: 15px;
+    }
+
+    h3 {
+        margin-top: 30px;
+        color: #6e5a46;
+    }
+
+    .booking-details {
+        list-style: none;
+        padding: 0;
+    }
+
+        .booking-details li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e6dcd0;
+            color: #4a3b2c;
+        }
+
+    .price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #8d6e54;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 25px;
+        text-decoration: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #b89b7a, #8d6e54);
+        color: white;
+        transition: 0.3s;
+    }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+</style>
+
+<div class="result-card">
+
+    <h2>@ViewBag.MessageTitle</h2>
+    <p>@ViewBag.MessageBody</p>
+
+    <h3>Booking Details</h3>
+
+    <ul class="booking-details">
+        <li><strong>Booking Code:</strong> @Model.BookingCode</li>
+        <li><strong>Hotel:</strong> @Model.HotelName</li>
+        <li><strong>Room:</strong> @Model.RoomName (@Model.RoomType)</li>
+        <li><strong>Dates:</strong> @Model.CheckIn → @Model.CheckOut</li>
+        <li><strong>Guests:</strong> @Model.Guests</li>
+        <li><strong>Payment:</strong> @Model.PaymentMethodName</li>
+        <li class="price"><strong>Total:</strong> @Model.TotalPrice EUR</li>
+    </ul>
+
+    <a asp-controller="Booking" asp-action="Index" class="back-link">
+        Create Another Booking
+    </a>
+
+</div>
