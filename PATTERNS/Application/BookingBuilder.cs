@@ -22,6 +22,7 @@ public class BookingBuilder
         return this;
     }
 
+
     public BookingBuilder SetDates(DateOnly checkIn, DateOnly checkOut)
     {
         _booking.CheckIn = checkIn;
