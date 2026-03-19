@@ -12,6 +12,9 @@ builder.Services.AddSingleton<IHotelRepository>(_ => InMemoryHotelRepository.Ins
 // Factory / Services
 builder.Services.AddSingleton<PaymentMethodFactory>();
 builder.Services.AddSingleton<IUiFactory, WebUiFactory>();
+// Theme Abstract Factories
+builder.Services.AddTransient<ThemeBlackFactory>();
+builder.Services.AddTransient<ThemeLightFactory>();
 builder.Services.AddSingleton<BookingService>();
 
 var app = builder.Build();

@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Theme Factory";
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f5efe6, #e8dccb);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .theme-card {
+        max-width: 600px;
+        margin: 60px auto;
+        padding: 40px;
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+
+    h2 {
+        color: #5c4633;
+        margin-bottom: 10px;
+    }
+
+    p {
+        color: #6e5a46;
+        margin-bottom: 30px;
+    }
+
+    .theme-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .btn-dark-theme {
+        padding: 14px 32px;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #1a1a1a, #3a3a3a);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .btn-light-theme {
+        padding: 14px 32px;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #e0e0e0, #ffffff);
+        color: #333;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid #ccc;
+        transition: 0.3s;
+    }
+
+    .btn-dark-theme:hover, .btn-light-theme:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+</style>
+
+<div class="theme-card">
+    <h2>Abstract Factory — Theme Demo</h2>
+    <p>Выбери тему, чтобы увидеть как Abstract Factory создаёт фон и кнопку</p>
+
+    <div class="theme-buttons">
+        <a href="/Theme/Preview?theme=dark" class="btn-dark-theme">🌑 ThemeBlack</a>
+        <a href="/Theme/Preview?theme=light" class="btn-light-theme">☀️ ThemeLight</a>
+    </div>
+</div>

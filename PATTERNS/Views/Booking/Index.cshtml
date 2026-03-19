@@ -2,31 +2,63 @@
 @using PATTERNS.Domain
 
 <style>
+    :root {
+        --bg-page: linear-gradient(135deg, #f5efe6, #e8dccb);
+        --bg-card: #ffffffcc;
+        --text-title: #5c4633;
+        --text-label: #6e5a46;
+        --text-field: #4a3b2c;
+        --border-color: #d6c7b7;
+        --field-bg: #fdfaf6;
+        --btn-bg: linear-gradient(90deg, #b89b7a, #8d6e54);
+        --btn-color: white;
+        --error-bg: #fbeaea;
+        --error-border: #d88;
+        --error-text: #7a1f1f;
+    }
+
+    body.theme-dark {
+        --bg-page: linear-gradient(135deg, #1a1a2e, #16213e);
+        --bg-card: rgba(30, 30, 50, 0.92);
+        --text-title: #e0d7ff;
+        --text-label: #a99fc0;
+        --text-field: #d0c8e8;
+        --border-color: #44415a;
+        --field-bg: #252540;
+        --btn-bg: linear-gradient(90deg, #6c63ff, #48439e);
+        --btn-color: white;
+        --error-bg: #3a1f2e;
+        --error-border: #a04060;
+        --error-text: #f5a0b0;
+    }
+
     body {
-        background: linear-gradient(135deg, #f5efe6, #e8dccb);
+        background: var(--bg-page);
         font-family: 'Segoe UI', sans-serif;
+        transition: background 0.4s;
     }
 
     .booking-card {
         max-width: 650px;
-        margin: 60px auto;
+        margin: 40px auto;
         padding: 40px;
-        background: #ffffffcc;
+        background: var(--bg-card);
         backdrop-filter: blur(8px);
         border-radius: 16px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        transition: background 0.4s;
     }
 
     h2 {
         text-align: center;
-        margin-bottom: 30px;
-        color: #5c4633;
+        margin-bottom: 10px;
+        color: var(--text-title);
         font-weight: 600;
     }
 
     label {
         font-weight: 500;
-        color: #6e5a46;
+        color: var(--text-label);
         margin-bottom: 5px;
         display: block;
     }
@@ -35,8 +67,9 @@
         width: 100%;
         padding: 10px;
         border-radius: 8px;
-        border: 1px solid #d6c7b7;
-        background-color: #fdfaf6;
+        border: 1px solid var(--border-color);
+        background-color: var(--field-bg);
+        color: var(--text-field);
         transition: 0.3s;
     }
 
@@ -56,8 +89,8 @@
         margin-top: 25px;
         border: none;
         border-radius: 10px;
-        background: linear-gradient(90deg, #b89b7a, #8d6e54);
-        color: white;
+        background: var(--btn-bg);
+        color: var(--btn-color);
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
@@ -66,22 +99,83 @@
 
         .book-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
     .error-box {
         padding: 15px;
         border-radius: 10px;
-        background-color: #fbeaea;
-        border: 1px solid #d88;
+        background-color: var(--error-bg);
+        border: 1px solid var(--error-border);
         margin-bottom: 20px;
-        color: #7a1f1f;
+        color: var(--error-text);
+    }
+
+    .theme-switcher {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .theme-btn {
+        padding: 7px 20px;
+        border-radius: 20px;
+        border: 2px solid transparent;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .theme-btn.light-btn {
+            background: linear-gradient(90deg, #e8dccb, #f5efe6);
+            color: #5c4633;
+            border-color: #d6c7b7;
+        }
+
+        .theme-btn.dark-btn {
+            background: linear-gradient(90deg, #1a1a2e, #6c63ff);
+            color: white;
+            border-color: #6c63ff;
+        }
+
+        .theme-btn.active {
+            transform: scale(1.07);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+        }
+
+    .theme-label {
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-label);
+        margin-bottom: 18px;
+        opacity: 0.8;
     }
 </style>
+
+<!-- Применяем тему мгновенно до рендера — без мигания -->
+<script>
+    (function () {
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+        if (getCookie('theme') === 'dark') {
+            document.body.classList.add('theme-dark');
+        }
+    })();
+</script>
 
 <div class="booking-card">
 
     <h2>Luxury Hotel Booking</h2>
+
+    <div class="theme-switcher">
+        <button type="button" class="theme-btn light-btn" id="btn-light" onclick="setTheme('light')">☀️ ThemeLight</button>
+        <button type="button" class="theme-btn dark-btn" id="btn-dark" onclick="setTheme('dark')">🌑 ThemeBlack</button>
+    </div>
+    <div class="theme-label" id="theme-label">Active factory: <strong>ThemeLightFactory</strong> — Background: #ffffff, Button: Light Button</div>
 
     @if (ViewBag.ErrorBody != null)
     {
@@ -92,38 +186,65 @@
     }
 
     <form asp-action="Index" method="post">
-
         <div class="form-group">
             <label>Hotel</label>
             <select asp-for="HotelId" asp-items="Model.Hotels"></select>
         </div>
-
         <div class="form-group">
             <label>Room Type</label>
             <select asp-for="RoomType" asp-items="Html.GetEnumSelectList<RoomType>()"></select>
         </div>
-
         <div class="form-group">
             <label>Check-In</label>
             <input asp-for="CheckIn" type="date" />
         </div>
-
         <div class="form-group">
             <label>Check-Out</label>
             <input asp-for="CheckOut" type="date" />
         </div>
-
         <div class="form-group">
             <label>Guests</label>
             <input asp-for="Guests" type="number" min="1" />
         </div>
-
         <div class="form-group">
             <label>Payment</label>
             <select asp-for="PaymentType" asp-items="Model.PaymentTypes"></select>
         </div>
-
         <button type="submit" class="book-btn">Book Now</button>
-
     </form>
 </div>
+
+<script>
+    function getCookie(name) {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+    }
+
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('theme-dark');
+            document.getElementById('btn-dark').classList.add('active');
+            document.getElementById('btn-light').classList.remove('active');
+            document.getElementById('theme-label').innerHTML =
+                'Active factory: <strong>ThemeBlackFactory</strong> — Background: #1a1a1a, Button: Dark Button';
+        } else {
+            document.body.classList.remove('theme-dark');
+            document.getElementById('btn-light').classList.add('active');
+            document.getElementById('btn-dark').classList.remove('active');
+            document.getElementById('theme-label').innerHTML =
+                'Active factory: <strong>ThemeLightFactory</strong> — Background: #ffffff, Button: Light Button';
+        }
+        document.cookie = 'theme=' + theme + '; path=/; max-age=31536000';
+    }
+
+    // Восстановить активную кнопку при загрузке
+    const saved = getCookie('theme');
+    if (saved === 'dark') {
+        document.getElementById('btn-dark').classList.add('active');
+        document.getElementById('btn-light').classList.remove('active');
+        document.getElementById('theme-label').innerHTML =
+            'Active factory: <strong>ThemeBlackFactory</strong> — Background: #1a1a1a, Button: Dark Button';
+    } else {
+        document.getElementById('btn-light').classList.add('active');
+    }
+</script>

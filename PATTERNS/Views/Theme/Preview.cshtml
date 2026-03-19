@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Theme Preview";
+    bool isDark = ViewBag.ThemeName == "ThemeBlack";
+    string bgColor = ViewBag.BackgroundColor;
+    string textColor = isDark ? "#ffffff" : "#222222";
+    string cardBorder = isDark ? "#444" : "#ddd";
+}
+
+<style>
+    body {
+        background-color: @bgColor;
+        font-family: 'Segoe UI', sans-serif;
+        transition: background 0.4s;
+    }
+
+    .preview-card {
+        max-width: 600px;
+        margin: 60px auto;
+        padding: 40px;
+        border-radius: 16px;
+        border: 1px solid @cardBorder;
+        background-color: @(isDark ? "#2a2a2a" : "#f9f9f9");
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        color: @textColor;
+    }
+
+    h2 {
+        margin-bottom: 10px;
+    }
+
+    .label {
+        font-size: 13px;
+        opacity: 0.6;
+        margin-bottom: 4px;
+    }
+
+    .value {
+        font-size: 16px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .demo-bg {
+        padding: 14px;
+        border-radius: 10px;
+        background-color: @bgColor;
+        border: 1px solid @cardBorder;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: @textColor;
+    }
+
+    .demo-btn {
+        padding: 12px 28px;
+        border-radius: 10px;
+        border: none;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        background: @(isDark ? "#555" : "#e0e0e0");
+        color: @textColor;
+        margin-bottom: 30px;
+    }
+
+    .back-link {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #b89b7a, #8d6e54);
+        color: white;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+</style>
+
+<div class="preview-card">
+    <h2>@ViewBag.ThemeName</h2>
+
+    <div class="label">Фабрика создала фон:</div>
+    <div class="demo-bg">@ViewBag.BackgroundRender</div>
+
+    <div class="label">Цвет фона:</div>
+    <div class="value">@ViewBag.BackgroundColor</div>
+
+    <div class="label">Фабрика создала кнопку:</div>
+    <button class="demo-btn">@ViewBag.ButtonLabel</button>
+
+    <div class="label">Render() кнопки:</div>
+    <div class="value">@ViewBag.ButtonRender</div>
+
+    <br />
+    <a href="/Theme" class="back-link">← Назад к выбору темы</a>
+</div>
