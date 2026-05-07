@@ -1,5 +1,6 @@
 ﻿using PATTERNS.Domain;
 using PATTERNS.Interfaces;
+using PATTERNS.Lab3.State;
 
 namespace PATTERNS.Application;
 
@@ -17,12 +18,13 @@ public class BookingService
     }
 
     public (Booking? booking, IConfirmationMessage message) CreateBooking(
-        string hotelId,
-        RoomType roomType,
-        DateOnly checkIn,
-        DateOnly checkOut,
-        int guests,
-        string paymentType)
+    string hotelId,
+    RoomType roomType,
+    DateOnly checkIn,
+    DateOnly checkOut,
+    int guests,
+    string paymentType,
+    string guestName = "Guest")   // <- добавь это
     {
         if (checkOut <= checkIn)
             return (null, _uiFactory.CreateError("Check-out must be after check-in."));
@@ -65,6 +67,19 @@ public class BookingService
 
         // Abstract Factory: создаём объект UI-сообщения
         var msg = _uiFactory.CreateConfirmation(booking.BookingCode, booking.HotelName, booking.RoomName, booking.TotalPrice);
+
+        // State pattern: добавляем бронирование в StateStore
+        BookingStateStore.Add(new BookingContext
+        {
+            BookingId = booking.BookingCode,
+            GuestName = guestName,
+            HotelName = booking.HotelName,
+            RoomType = booking.RoomName,
+            CheckIn = checkIn.ToDateTime(TimeOnly.MinValue),
+            CheckOut = checkOut.ToDateTime(TimeOnly.MinValue),
+            TotalPrice = (double)booking.TotalPrice,
+            State = new PendingState()
+        });
 
         return (booking, msg);
     }

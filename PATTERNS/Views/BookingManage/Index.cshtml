@@ -1,0 +1,200 @@
+﻿@model List<PATTERNS.Lab3.State.BookingContext>
+@{
+    ViewData["Title"] = "Booking Management";
+}
+
+<style>
+    .manage-page {
+        max-width: 900px;
+        margin: 40px auto;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #5c4633;
+        margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+        font-size: 14px;
+        color: #8d6e54;
+        margin-bottom: 28px;
+    }
+
+    .booking-card {
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        margin-bottom: 16px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .booking-id {
+        font-size: 12px;
+        color: #8d6e54;
+        margin-bottom: 4px;
+    }
+
+    .booking-guest {
+        font-size: 18px;
+        font-weight: 700;
+        color: #5c4633;
+        margin-bottom: 4px;
+    }
+
+    .booking-info {
+        font-size: 14px;
+        color: #6e5a46;
+        margin-bottom: 8px;
+    }
+
+    .state-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        color: white;
+    }
+
+    .booking-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 130px;
+    }
+
+    .action-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        color: white;
+        text-align: center;
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+    .btn-confirm {
+        background: #2e86de;
+    }
+
+    .btn-checkin {
+        background: #8e44ad;
+    }
+
+    .btn-complete {
+        background: #27ae60;
+    }
+
+    .btn-cancel {
+        background: #e74c3c;
+    }
+
+    .no-actions {
+        font-size: 13px;
+        color: #8d6e54;
+        font-style: italic;
+    }
+
+    .state-info {
+        background: #f5efe6;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-bottom: 24px;
+        font-size: 13px;
+        color: #6e5a46;
+    }
+
+        .state-info strong {
+            display: block;
+            color: #5c4633;
+            margin-bottom: 8px;
+        }
+
+    .state-flow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .state-node {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+    }
+
+    .flow-arrow {
+        color: #b89b7a;
+        font-weight: bold;
+    }
+</style>
+
+<div class="manage-page">
+    <div class="page-title">📋 Booking Management</div>
+    <div class="page-subtitle">Manage booking states — each booking moves through a defined lifecycle</div>
+
+    <div class="state-info">
+        <strong>🔄 State Pattern — Booking Lifecycle:</strong>
+        <div class="state-flow">
+            <span class="state-node" style="background:#e8a020">Pending</span>
+            <span class="flow-arrow">→</span>
+            <span class="state-node" style="background:#2e86de">Confirmed</span>
+            <span class="flow-arrow">→</span>
+            <span class="state-node" style="background:#8e44ad">Checked In</span>
+            <span class="flow-arrow">→</span>
+            <span class="state-node" style="background:#27ae60">Completed</span>
+            <span class="flow-arrow">|</span>
+            <span class="state-node" style="background:#e74c3c">Cancelled</span>
+        </div>
+    </div>
+
+    @foreach (var booking in Model)
+    {
+        <div class="booking-card">
+            <div>
+                <div class="booking-id">#@booking.BookingId</div>
+                <div class="booking-guest">👤 @booking.GuestName</div>
+                <div class="booking-info">
+                    🏨 @booking.HotelName · @booking.RoomType<br />
+                    📅 @booking.CheckIn.ToString("MMM dd") → @booking.CheckOut.ToString("MMM dd, yyyy")<br />
+                    💰 @booking.TotalPrice EUR total
+                </div>
+                <span class="state-badge" style="background:@booking.State.StateColor">
+                    @booking.State.StateName
+                </span>
+            </div>
+            <div class="booking-actions">
+                @if (!booking.State.AvailableActions.Any())
+                {
+                    <div class="no-actions">No actions available</div>
+                }
+                @foreach (var action in booking.State.AvailableActions)
+                {
+                    <form method="post" asp-action="Action">
+                        <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                        <input type="hidden" name="action" value="@action" />
+                        <button type="submit" class="action-btn btn-@action.ToLower()">
+                            @action
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    }
+</div>

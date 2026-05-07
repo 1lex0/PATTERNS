@@ -1,0 +1,243 @@
+﻿@model IReadOnlyList<PATTERNS.Lab3.Command.BookingRecord>
+@{
+    ViewData["Title"] = "Booking History";
+    var history = ViewBag.History as List<(string name, string description)> ?? new();
+}
+
+<style>
+    .history-page {
+        max-width: 1000px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 24px;
+    }
+
+    .panel {
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        height: fit-content;
+    }
+
+    .panel-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #5c4633;
+        margin-bottom: 20px;
+    }
+
+    .booking-row {
+        background: #fdfaf6;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 12px;
+        border: 1px solid #e8dccb;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 16px;
+        transition: 0.3s;
+    }
+
+        .booking-row.cancelled {
+            opacity: 0.5;
+            background: #f5f5f5;
+        }
+
+    .booking-code {
+        font-size: 12px;
+        color: #8d6e54;
+        margin-bottom: 4px;
+    }
+
+    .booking-guest {
+        font-size: 16px;
+        font-weight: 700;
+        color: #5c4633;
+        margin-bottom: 4px;
+    }
+
+    .booking-info {
+        font-size: 13px;
+        color: #6e5a46;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        margin-top: 6px;
+    }
+
+    .badge-active {
+        background: #27ae60;
+    }
+
+    .badge-cancelled {
+        background: #e74c3c;
+    }
+
+    .cancel-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #e74c3c;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .cancel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+    .undo-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #b89b7a, #8d6e54);
+        color: white;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-bottom: 20px;
+    }
+
+        .undo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+    .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .history-item {
+        background: #f5efe6;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .history-item-name {
+        font-weight: 700;
+        color: #5c4633;
+        margin-bottom: 2px;
+    }
+
+    .history-item-desc {
+        color: #6e5a46;
+        font-size: 12px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #8d6e54;
+        font-size: 15px;
+    }
+
+    .pattern-info {
+        background: #f5efe6;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 13px;
+        color: #6e5a46;
+        margin-top: 16px;
+    }
+
+        .pattern-info strong {
+            display: block;
+            color: #5c4633;
+            margin-bottom: 4px;
+        }
+</style>
+
+<div class="history-page">
+    <!-- Left: Bookings -->
+    <div class="panel">
+        <div class="panel-title">📋 Booking History</div>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                No bookings yet.<br />
+                <a asp-controller="Booking" asp-action="Index" style="color:#8d6e54">Create one →</a>
+            </div>
+        }
+
+        @foreach (var b in Model.OrderByDescending(x => x.CreatedAt))
+        {
+            <div class="booking-row @(b.IsCancelled ? "cancelled" : "")">
+                <div>
+                    <div class="booking-code">#@b.BookingCode</div>
+                    <div class="booking-guest">👤 @b.GuestName</div>
+                    <div class="booking-info">
+                        🏨 @b.HotelName · @b.RoomName<br />
+                        💰 @b.TotalPrice EUR · 🕐 @b.CreatedAt.ToString("MMM dd, HH:mm")
+                    </div>
+                    <span class="status-badge @(b.IsCancelled ? "badge-cancelled" : "badge-active")">
+                        @(b.IsCancelled ? "Cancelled" : "Active")
+                    </span>
+                </div>
+                @if (!b.IsCancelled)
+                {
+                    <form method="post" asp-action="Cancel">
+                        <input type="hidden" name="bookingCode" value="@b.BookingCode" />
+                        <button type="submit" class="cancel-btn">Cancel</button>
+                    </form>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Right: Command History + Undo -->
+    <div>
+        <div class="panel">
+            <div class="panel-title">⚡ Command Invoker</div>
+
+            <form method="post" asp-action="Undo">
+                <button type="submit" class="undo-btn">↩ Undo Last Command</button>
+            </form>
+
+            <div class="panel-title" style="font-size:15px; margin-bottom:12px;">
+                Command Stack
+            </div>
+
+            @if (!history.Any())
+            {
+                <div style="font-size:13px; color:#8d6e54; text-align:center; padding:20px;">
+                    No commands executed yet
+                </div>
+            }
+
+            <div class="history-list">
+                @foreach (var (name, desc) in history)
+                {
+                    <div class="history-item">
+                        <div class="history-item-name">@name</div>
+                        <div class="history-item-desc">@desc</div>
+                    </div>
+                }
+            </div>
+
+            <div class="pattern-info">
+                <strong>⚡ Command Pattern</strong>
+                Each action is a Command object. The Invoker executes and stores them in a stack. Undo pops the last command and reverses it.
+            </div>
+        </div>
+    </div>
+</div>

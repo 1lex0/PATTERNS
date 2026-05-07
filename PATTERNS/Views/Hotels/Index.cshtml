@@ -1,0 +1,360 @@
+﻿@model List<PATTERNS.Lab3.Observer.FilteredHotel>
+@{
+    ViewData["Title"] = "Hotels";
+    var districts = ViewBag.Districts as List<string> ?? new List<string>();
+    var amenities = ViewBag.Amenities as List<string> ?? new List<string>();
+}
+
+<style>
+    .hotels-page {
+        max-width: 1100px;
+        margin: 30px auto;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 24px;
+    }
+
+    .filter-panel {
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+    .filter-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #5c4633;
+        margin-bottom: 20px;
+    }
+
+    .filter-group {
+        margin-bottom: 18px;
+    }
+
+    .filter-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6e5a46;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-select, .filter-range {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #d6c7b7;
+        background: #fdfaf6;
+        color: #4a3b2c;
+        font-size: 14px;
+    }
+
+    .amenity-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+
+    .amenity-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #6e5a46;
+        cursor: pointer;
+    }
+
+        .amenity-item input[type=checkbox] {
+            width: 15px;
+            height: 15px;
+            accent-color: #b89b7a;
+        }
+
+    .price-display {
+        text-align: right;
+        font-size: 13px;
+        color: #8d6e54;
+        margin-top: 4px;
+    }
+
+    input[type=range] {
+        width: 100%;
+        accent-color: #b89b7a;
+    }
+
+    .observer-badge {
+        background: #f5efe6;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 12px;
+        color: #6e5a46;
+        margin-top: 20px;
+    }
+
+        .observer-badge strong {
+            display: block;
+            color: #5c4633;
+            margin-bottom: 4px;
+        }
+
+    .hotels-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        align-content: start;
+    }
+
+    .hotel-card {
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+    }
+
+        .hotel-card:hover {
+            transform: translateY(-4px);
+        }
+
+    .hotel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .hotel-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #5c4633;
+    }
+
+    .hotel-stars {
+        color: #f0a500;
+        font-size: 14px;
+    }
+
+    .hotel-district {
+        font-size: 13px;
+        color: #8d6e54;
+        margin-bottom: 10px;
+    }
+
+    .hotel-desc {
+        font-size: 14px;
+        color: #6e5a46;
+        line-height: 1.6;
+        margin-bottom: 14px;
+    }
+
+    .hotel-amenities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .amenity-tag {
+        background: #f5efe6;
+        color: #5c4633;
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+    .hotel-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .hotel-price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #5c4633;
+    }
+
+        .hotel-price span {
+            font-size: 13px;
+            font-weight: 400;
+            color: #8d6e54;
+        }
+
+    .book-btn {
+        padding: 8px 20px;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #b89b7a, #8d6e54);
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .book-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        color: #8d6e54;
+        font-size: 16px;
+        grid-column: 1 / -1;
+    }
+
+    .results-count {
+        font-size: 14px;
+        color: #8d6e54;
+        margin-bottom: 16px;
+    }
+
+        .results-count strong {
+            color: #5c4633;
+        }
+</style>
+
+<div class="hotels-page">
+    <!-- Filter Panel (Observer) -->
+    <div class="filter-panel">
+        <div class="filter-title">🔍 Filter Hotels</div>
+
+        <div class="filter-group">
+            <label class="filter-label">District</label>
+            <select class="filter-select" id="filter-district">
+                <option value="">All Districts</option>
+                @foreach (var d in districts)
+                {
+                    <option value="@d">@d</option>
+                }
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">Max Price: <span id="price-val">250</span> EUR/night</label>
+            <input type="range" id="filter-price" min="20" max="250" value="250"
+                   oninput="document.getElementById('price-val').innerText = this.value" />
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">Min Stars</label>
+            <select class="filter-select" id="filter-stars">
+                <option value="0">Any</option>
+                <option value="2">2+</option>
+                <option value="3">3+</option>
+                <option value="4">4+</option>
+                <option value="5">5 only</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">Amenities</label>
+            <div class="amenity-grid">
+                @foreach (var a in amenities)
+                {
+                    <label class="amenity-item">
+                        <input type="checkbox" class="amenity-check" value="@a" />
+                        @a
+                    </label>
+                }
+            </div>
+        </div>
+
+        <div class="observer-badge">
+            <strong>👁 Observer Pattern</strong>
+            Filters subscribe to changes. When you adjust any filter, the Subject notifies HotelListObserver and the list updates instantly.
+        </div>
+    </div>
+
+    <!-- Hotels List -->
+    <div>
+        <div class="results-count">Showing <strong id="results-count">@Model.Count</strong> hotels</div>
+        <div class="hotels-grid" id="hotels-grid">
+            @foreach (var hotel in Model)
+            {
+                <div class="hotel-card">
+                    <div class="hotel-header">
+                        <div class="hotel-name">@hotel.Name</div>
+                        <div class="hotel-stars">@string.Concat(Enumerable.Repeat("★", hotel.Stars))</div>
+                    </div>
+                    <div class="hotel-district">📍 @hotel.District · @hotel.Floors floors</div>
+                    <div class="hotel-desc">@hotel.Description</div>
+                    <div class="hotel-amenities">
+                        @foreach (var a in hotel.Amenities)
+                        {
+                            <span class="amenity-tag">@a</span>
+                        }
+                    </div>
+                    <div class="hotel-footer">
+                        <div class="hotel-price">@hotel.PricePerNight EUR <span>/ night</span></div>
+                        <a asp-controller="Booking" asp-action="Index" class="book-btn">Book →</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function getCheckedAmenities() {
+        return Array.from(document.querySelectorAll('.amenity-check:checked'))
+                    .map(cb => cb.value);
+    }
+
+    function applyFilters() {
+        const district = document.getElementById('filter-district').value;
+        const maxPrice = document.getElementById('filter-price').value;
+        const minStars = document.getElementById('filter-stars').value;
+        const amenities = getCheckedAmenities();
+
+        fetch('/Hotels/Filter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ district, maxPrice, minStars, amenities })
+        })
+        .then(r => r.json())
+        .then(hotels => {
+            const grid = document.getElementById('hotels-grid');
+            document.getElementById('results-count').innerText = hotels.length;
+
+            if (hotels.length === 0) {
+                grid.innerHTML = '<div class="no-results">😕 No hotels match your filters</div>';
+                return;
+            }
+
+            grid.innerHTML = hotels.map(h => `
+                <div class="hotel-card">
+                    <div class="hotel-header">
+                        <div class="hotel-name">${h.name}</div>
+                        <div class="hotel-stars">${'★'.repeat(h.stars)}</div>
+                    </div>
+                    <div class="hotel-district">📍 ${h.district} · ${h.floors} floors</div>
+                    <div class="hotel-desc">${h.description}</div>
+                    <div class="hotel-amenities">
+                        ${h.amenities.map(a => `<span class="amenity-tag">${a}</span>`).join('')}
+                    </div>
+                    <div class="hotel-footer">
+                        <div class="hotel-price">${h.pricePerNight} EUR <span>/ night</span></div>
+                        <a href="/Booking" class="book-btn">Book →</a>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
+    document.getElementById('filter-district').addEventListener('change', applyFilters);
+    document.getElementById('filter-price').addEventListener('input', applyFilters);
+    document.getElementById('filter-stars').addEventListener('change', applyFilters);
+    document.querySelectorAll('.amenity-check').forEach(cb =>
+        cb.addEventListener('change', applyFilters));
+</script>
