@@ -1,0 +1,428 @@
+﻿@using PATTERNS.Composite
+@using PATTERNS.Domain
+@{
+    ViewData["Title"] = "Composite — Room Status";
+    var hotel = (HotelComposite)ViewBag.Hotel;
+    var hotels = (IReadOnlyList<Hotel>)ViewBag.Hotels;
+    var selectedHotelId = (string)ViewBag.SelectedHotelId;
+    var floors = hotel.GetChildren().Cast<FloorComposite>().ToList();
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f5efe6, #e8dccb);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .composite-card {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 40px;
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+        text-align: center;
+        color: #5c4633;
+        margin-bottom: 5px;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #6e5a46;
+        margin-bottom: 25px;
+        font-size: 14px;
+    }
+
+    /* Выбор отеля */
+    .hotel-selector {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+        .hotel-selector a {
+            padding: 10px 22px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.3s;
+            border: 2px solid #d6c7b7;
+            color: #5c4633;
+            background: white;
+        }
+
+            .hotel-selector a.active {
+                background: linear-gradient(90deg, #5c4633, #8d6e54);
+                color: white;
+                border-color: #5c4633;
+            }
+
+            .hotel-selector a:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            }
+
+    /* Шапка отеля */
+    .hotel-header {
+        background: linear-gradient(90deg, #5c4633, #8d6e54);
+        color: white;
+        padding: 18px 24px;
+        border-radius: 12px;
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .hotel-header .name {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .hotel-header .stats {
+            text-align: right;
+            font-size: 14px;
+        }
+
+            .hotel-header .stats .big {
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+    /* Дата */
+    .date-bar {
+        text-align: center;
+        padding: 8px;
+        color: #8d6e54;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    /* Легенда */
+    .legend {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #5c4633;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .legend-box {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    /* Таблица этажей */
+    .floor-section {
+        margin-bottom: 16px;
+    }
+
+    .floor-label {
+        background: #f0e6d8;
+        padding: 10px 16px;
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+        color: #5c4633;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .floor-label .floor-stats {
+            color: #8d6e54;
+            font-weight: 400;
+        }
+
+    .room-grid {
+        display: flex;
+        gap: 0;
+        border: 1px solid #d6c7b7;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        overflow: hidden;
+    }
+
+    .room-cell {
+        flex: 1;
+        min-height: 70px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+        border-right: 1px solid #e6dcd0;
+        position: relative;
+        user-select: none;
+    }
+
+        .room-cell:last-child {
+            border-right: none;
+        }
+
+        .room-cell:hover {
+            filter: brightness(0.92);
+        }
+
+        .room-cell.free {
+            background: #4caf50;
+            color: white;
+        }
+
+        .room-cell.occupied {
+            background: #f44336;
+            color: white;
+        }
+
+        .room-cell.cleaning {
+            background: #ffeb3b;
+            color: #333;
+        }
+
+        .room-cell .room-number {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .room-cell .room-price {
+            font-size: 11px;
+            opacity: 0.85;
+        }
+
+        .room-cell .room-type-label {
+            font-size: 10px;
+            opacity: 0.75;
+        }
+
+    /* Контекстное меню */
+    .context-menu {
+        display: none;
+        position: fixed;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+        z-index: 1000;
+        overflow: hidden;
+        min-width: 180px;
+    }
+
+        .context-menu.show {
+            display: block;
+        }
+
+    .context-menu-title {
+        padding: 10px 16px;
+        font-weight: 600;
+        color: #5c4633;
+        font-size: 13px;
+        background: #f5f0ea;
+        border-bottom: 1px solid #e6dcd0;
+    }
+
+    .context-menu-item {
+        padding: 10px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: #4a3b2c;
+        transition: background 0.15s;
+    }
+
+        .context-menu-item:hover {
+            background: #f5f0ea;
+        }
+
+        .context-menu-item .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+    /* Инфо-блок */
+    .pattern-info {
+        margin-top: 30px;
+        padding: 20px;
+        background: #fdfaf6;
+        border-radius: 10px;
+        border: 1px solid #e6dcd0;
+        color: #5c4633;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+        .pattern-info strong {
+            color: #8d6e54;
+        }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #b89b7a, #8d6e54);
+        color: white;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+</style>
+
+<div class="composite-card">
+
+    <h2>Composite — Room Status Board</h2>
+    <p class="subtitle">Дерево отеля: Hotel → Floor → Room. Правый клик по комнате — сменить статус.</p>
+
+    <!-- Выбор отеля -->
+    <div class="hotel-selector">
+        @foreach (var h in hotels)
+        {
+            var isActive = h.Id == selectedHotelId ? "active" : "";
+            <a href="/Composite?hotelId=@h.Id" class="@isActive">@h.Name</a>
+        }
+    </div>
+
+    <!-- Шапка -->
+    <div class="hotel-header">
+        <div class="name">🏨 @hotel.Name</div>
+        <div class="stats">
+            <div>@hotel.GetRoomCount() rooms total</div>
+            <div class="big" id="free-count">@hotel.GetFreeRoomCount() free</div>
+        </div>
+    </div>
+
+    <div class="date-bar">📅 @DateTime.Now.ToString("dddd, dd MMMM yyyy")</div>
+
+    <!-- Легенда -->
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-box" style="background: #4caf50;"></div> Free
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background: #f44336;"></div> Occupied
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background: #ffeb3b;"></div> Cleaning
+        </div>
+    </div>
+
+    <!-- Этажи с комнатами -->
+    @foreach (var floor in floors)
+    {
+        var rooms = floor.GetChildren().Cast<RoomLeaf>().ToList();
+        <div class="floor-section">
+            <div class="floor-label">
+                <span>📂 @floor.Name</span>
+                <span class="floor-stats">
+                    @rooms.Count rooms · <span class="floor-free-count" data-floor="@floor.Name">@floor.GetFreeRoomCount()</span> free
+                </span>
+            </div>
+            <div class="room-grid">
+                @foreach (var room in rooms)
+                {
+                    <div class="room-cell @room.Status"
+                         data-room="@room.Name"
+                         data-floor="@floor.Name"
+                         data-status="@room.Status"
+                         oncontextmenu="openMenu(event, this)">
+                        <div class="room-number">@room.Name</div>
+                        <div class="room-type-label">@room.RoomType</div>
+                        <div class="room-price">@room.PricePerNight €</div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Контекстное меню -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-title" id="menuTitle">Room 101</div>
+        <div class="context-menu-item" onclick="setStatus('free')">
+            <div class="dot" style="background: #4caf50;"></div> Free
+        </div>
+        <div class="context-menu-item" onclick="setStatus('occupied')">
+            <div class="dot" style="background: #f44336;"></div> Occupied
+        </div>
+        <div class="context-menu-item" onclick="setStatus('cleaning')">
+            <div class="dot" style="background: #ffeb3b;"></div> Cleaning
+        </div>
+    </div>
+
+ 
+
+    <a asp-controller="Booking" asp-action="Index" class="back-link">← Book a Room</a>
+</div>
+
+<script>
+    let activeCell = null;
+    const menu = document.getElementById('contextMenu');
+
+    function openMenu(e, cell) {
+        e.preventDefault();
+        activeCell = cell;
+        document.getElementById('menuTitle').textContent = cell.dataset.room;
+
+        menu.style.left = e.clientX + 'px';
+        menu.style.top = e.clientY + 'px';
+        menu.classList.add('show');
+    }
+
+    function setStatus(status) {
+        if (!activeCell) return;
+
+        // Убираем старый класс
+        activeCell.classList.remove('free', 'occupied', 'cleaning');
+        // Ставим новый
+        activeCell.classList.add(status);
+        activeCell.dataset.status = status;
+
+        menu.classList.remove('show');
+
+        // Пересчитываем счётчики (Composite логика на клиенте)
+        updateCounts();
+    }
+
+    function updateCounts() {
+        let totalFree = 0;
+
+        document.querySelectorAll('.floor-section').forEach(section => {
+            const floorCells = section.querySelectorAll('.room-cell');
+            let floorFree = 0;
+            floorCells.forEach(c => {
+                if (c.dataset.status === 'free') floorFree++;
+            });
+            totalFree += floorFree;
+
+            const floorLabel = section.querySelector('.floor-free-count');
+            if (floorLabel) floorLabel.textContent = floorFree;
+        });
+
+        document.getElementById('free-count').textContent = totalFree + ' free';
+    }
+
+    // Закрыть меню при клике в любое место
+    document.addEventListener('click', () => {
+        menu.classList.remove('show');
+    });
+</script>

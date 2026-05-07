@@ -1,8 +1,472 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    body, h1, h2, h3, p, a, span, div {
+        font-family: 'Inter', sans-serif;
+    }
+
+    body {
+        background: #f8fafc;
+    }
+
+    .hero {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        padding: 80px 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 60% 50%, rgba(99,102,241,0.15) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(245,158,11,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+    .hero-tag {
+        display: inline-block;
+        background: rgba(99,102,241,0.2);
+        color: #a5b4fc;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 24px;
+        border: 1px solid rgba(99,102,241,0.3);
+    }
+
+    .hero-title {
+        font-size: 52px;
+        font-weight: 800;
+        color: #f8fafc;
+        margin-bottom: 16px;
+        line-height: 1.15;
+        letter-spacing: -1px;
+    }
+
+        .hero-title .gold {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+    .hero-subtitle {
+        font-size: 17px;
+        color: #94a3b8;
+        max-width: 520px;
+        margin: 0 auto 40px;
+        line-height: 1.7;
+        font-weight: 400;
+    }
+
+    .hero-btns {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-gold {
+        padding: 14px 32px;
+        background: linear-gradient(90deg, #f59e0b, #d97706);
+        color: white;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 15px;
+        transition: 0.25s;
+        box-shadow: 0 4px 15px rgba(245,158,11,0.35);
+    }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245,158,11,0.45);
+            color: white;
+        }
+
+    .btn-outline {
+        padding: 14px 32px;
+        background: transparent;
+        color: #e2e8f0;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        border: 1.5px solid rgba(255,255,255,0.2);
+        transition: 0.25s;
+    }
+
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .stats-bar {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 20px 40px;
+        display: flex;
+        justify-content: center;
+        gap: 60px;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 26px;
+        font-weight: 800;
+        color: #0f172a;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .section {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 60px 24px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 28px;
+    }
+
+    .section-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .section-link {
+        font-size: 14px;
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .section-link:hover {
+            text-decoration: underline;
+        }
+
+    .hotels-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .hotel-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+        transition: 0.3s;
+    }
+
+        .hotel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+    .hotel-banner {
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 52px;
+    }
+
+    .banner-1 {
+        background: linear-gradient(135deg, #1e293b, #334155);
+    }
+
+    .banner-2 {
+        background: linear-gradient(135deg, #0c4a6e, #0369a1);
+    }
+
+    .banner-3 {
+        background: linear-gradient(135deg, #14532d, #166534);
+    }
+
+    .hotel-body {
+        padding: 20px;
+    }
+
+    .hotel-stars {
+        color: #f59e0b;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .hotel-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 6px;
+    }
+
+    .hotel-location {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 14px;
+    }
+
+    .hotel-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 14px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .hotel-price {
+        font-size: 18px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+        .hotel-price span {
+            font-size: 12px;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+    .book-link {
+        background: #6366f1;
+        color: white;
+        padding: 8px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .book-link:hover {
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .patterns-section {
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 60px 24px;
+    }
+
+    .patterns-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .patterns-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 32px;
+    }
+
+    .pattern-category {
+        border-radius: 14px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .cat-creational {
+        background: #fffbeb;
+        border-color: #fde68a;
+    }
+
+    .cat-structural {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+    }
+
+    .cat-behavioral {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+    .cat-title {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .cat-creational .cat-title {
+        color: #92400e;
+    }
+
+    .cat-structural .cat-title {
+        color: #1e40af;
+    }
+
+    .cat-behavioral .cat-title {
+        color: #166534;
+    }
+
+    .pat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        font-size: 13px;
+    }
+
+        .pat-item:last-child {
+            border-bottom: none;
+        }
+
+    .pat-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .pat-use {
+        color: #64748b;
+        font-size: 12px;
+    }
+</style>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-tag">✦ Design Patterns Showcase</div>
+    <div class="hero-title">
+        Find Your Perfect<br>
+        <span class="gold">Hotel Stay</span>
+    </div>
+    <p class="hero-subtitle">
+        A full-stack booking platform built with 13 design patterns —
+        Creational, Structural, and Behavioral.
+    </p>
+    <div class="hero-btns">
+        <a asp-controller="Hotels" asp-action="Index" class="btn-gold">Browse Hotels →</a>
+        <a asp-controller="Auth" asp-action="Register" class="btn-outline">Create Account</a>
+    </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+    <div class="stat-item">
+        <span class="stat-number">3</span>
+        <span class="stat-label">Hotels</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">9</span>
+        <span class="stat-label">Room Types</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">5</span>
+        <span class="stat-label">Payment Methods</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">13</span>
+        <span class="stat-label">Design Patterns</span>
+    </div>
+</div>
+
+<!-- HOTELS -->
+<div class="section">
+    <div class="section-header">
+        <div class="section-title">Featured Hotels</div>
+        <a asp-controller="Hotels" asp-action="Index" class="section-link">View all →</a>
+    </div>
+    <div class="hotels-grid">
+        <div class="hotel-card">
+            <div class="hotel-banner banner-1">✨</div>
+            <div class="hotel-body">
+                <div class="hotel-stars">★★★★★</div>
+                <div class="hotel-name">Aurora Grand Hotel</div>
+                <div class="hotel-location">📍 City Center</div>
+                <div class="hotel-footer">
+                    <div class="hotel-price">80 EUR <span>/ night</span></div>
+                    <a asp-controller="Booking" asp-action="Index" class="book-link">Book</a>
+                </div>
+            </div>
+        </div>
+        <div class="hotel-card">
+            <div class="hotel-banner banner-2">🌊</div>
+            <div class="hotel-body">
+                <div class="hotel-stars">★★★★</div>
+                <div class="hotel-name">SeaMoon Resort</div>
+                <div class="hotel-location">📍 Seaside</div>
+                <div class="hotel-footer">
+                    <div class="hotel-price">95 EUR <span>/ night</span></div>
+                    <a asp-controller="Booking" asp-action="Index" class="book-link">Book</a>
+                </div>
+            </div>
+        </div>
+        <div class="hotel-card">
+            <div class="hotel-banner banner-3">🎓</div>
+            <div class="hotel-body">
+                <div class="hotel-stars">★★</div>
+                <div class="hotel-name">UTM</div>
+                <div class="hotel-location">📍 University Area</div>
+                <div class="hotel-footer">
+                    <div class="hotel-price">20 EUR <span>/ night</span></div>
+                    <a asp-controller="Booking" asp-action="Index" class="book-link">Book</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PATTERNS -->
+<div class="patterns-section">
+    <div class="patterns-inner">
+        <div class="section-title" style="text-align:center;">Design Patterns Used</div>
+        <p style="text-align:center; color:#64748b; margin-top:8px; font-size:15px;">
+            13 patterns across all three GoF categories
+        </p>
+        <div class="patterns-grid">
+            <div class="pattern-category cat-creational">
+                <div class="cat-title">🟠 Creational (5)</div>
+                <div class="pat-item"><span class="pat-name">Singleton</span><span class="pat-use">HotelRepository</span></div>
+                <div class="pat-item"><span class="pat-name">Builder</span><span class="pat-use">BookingBuilder</span></div>
+                <div class="pat-item"><span class="pat-name">Prototype</span><span class="pat-use">RoomTemplate.Clone()</span></div>
+                <div class="pat-item"><span class="pat-name">Factory Method</span><span class="pat-use">PaymentFactory</span></div>
+                <div class="pat-item"><span class="pat-name">Abstract Factory</span><span class="pat-use">UI Theme Factory</span></div>
+            </div>
+            <div class="pattern-category cat-structural">
+                <div class="cat-title">🔵 Structural (5)</div>
+                <div class="pat-item"><span class="pat-name">Facade</span><span class="pat-use">BookingFacade</span></div>
+                <div class="pat-item"><span class="pat-name">Proxy</span><span class="pat-use">LoggingProxy</span></div>
+                <div class="pat-item"><span class="pat-name">Bridge</span><span class="pat-use">SMTP / Web notify</span></div>
+                <div class="pat-item"><span class="pat-name">Composite</span><span class="pat-use">Hotel → Floor → Room</span></div>
+                <div class="pat-item"><span class="pat-name">Adapter</span><span class="pat-use">PayPalAdapter</span></div>
+            </div>
+            <div class="pattern-category cat-behavioral">
+                <div class="cat-title">🟢 Behavioral (5)</div>
+                <div class="pat-item"><span class="pat-name">Chain of Resp.</span><span class="pat-use">Auth validation</span></div>
+                <div class="pat-item"><span class="pat-name">Observer</span><span class="pat-use">Hotel filters</span></div>
+                <div class="pat-item"><span class="pat-name">State</span><span class="pat-use">Booking lifecycle</span></div>
+                <div class="pat-item"><span class="pat-name">Strategy</span><span class="pat-use">Pricing algorithms</span></div>
+                <div class="pat-item"><span class="pat-name">Command</span><span class="pat-use">Booking + Undo</span></div>
+            </div>
+        </div>
+    </div>
 </div>

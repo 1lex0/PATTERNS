@@ -14,6 +14,8 @@ public class PaymentMethodFactory
             "cash" => new CashPaymentMethod(),
             "crypto" => new CryptoPaymentMethod(),
             "credit" => new CreditPaymentMethod(),
+            "mdl" => new MdlPaymentMethod(),
+            "paypal" => new PayPalPaymentAdapter(),
             _ => throw new ArgumentException("Unknown payment type. Use: Card, Cash, Crypto, Credit.")
         };
     }

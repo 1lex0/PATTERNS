@@ -1,0 +1,361 @@
+﻿@{
+    ViewData["Title"] = "Price Calculator";
+    var hotels = ViewBag.Hotels as List<PATTERNS.Domain.Hotel> ?? new();
+}
+
+<style>
+    .pricing-page {
+        max-width: 900px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .panel {
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .panel-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #5c4633;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6e5a46;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    select, input[type=number] {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #d6c7b7;
+        background: #fdfaf6;
+        color: #4a3b2c;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .strategy-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .strategy-card {
+        border: 2px solid #d6c7b7;
+        border-radius: 10px;
+        padding: 12px;
+        cursor: pointer;
+        transition: 0.3s;
+        background: #fdfaf6;
+    }
+
+        .strategy-card:hover {
+            border-color: #b89b7a;
+            transform: translateY(-2px);
+        }
+
+        .strategy-card.active {
+            border-color: #8d6e54;
+            background: #f5efe6;
+        }
+
+        .strategy-card input[type=radio] {
+            display: none;
+        }
+
+    .strategy-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #5c4633;
+        margin-bottom: 4px;
+    }
+
+    .strategy-desc {
+        font-size: 12px;
+        color: #8d6e54;
+        line-height: 1.4;
+    }
+
+    .calc-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #b89b7a, #8d6e54);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+    .result-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .result-card {
+        background: #f5efe6;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .result-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #5c4633;
+        margin-bottom: 14px;
+    }
+
+    .result-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #6e5a46;
+        padding: 6px 0;
+        border-bottom: 1px solid #e8dccb;
+    }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+    .result-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 22px;
+        font-weight: 700;
+        color: #5c4633;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 2px solid #d6c7b7;
+    }
+
+    .strategy-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #b89b7a, #8d6e54);
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .strategy-info-box {
+        background: #fdfaf6;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 13px;
+        color: #6e5a46;
+        line-height: 1.6;
+    }
+
+    .empty-result {
+        text-align: center;
+        padding: 60px 20px;
+        color: #8d6e54;
+        font-size: 15px;
+    }
+
+    .pattern-info {
+        background: #f5efe6;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 13px;
+        color: #6e5a46;
+        margin-top: 16px;
+    }
+
+        .pattern-info strong {
+            display: block;
+            color: #5c4633;
+            margin-bottom: 4px;
+        }
+</style>
+
+<div class="pricing-page">
+    <!-- Left: Calculator -->
+    <div class="panel">
+        <div class="panel-title">💰 Price Calculator</div>
+
+        <div class="form-group">
+            <label>Hotel</label>
+            <select id="sel-hotel" onchange="updateRooms()">
+                @foreach (var h in hotels)
+                {
+                    <option value="@h.Id">@h.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Room Type</label>
+            <select id="sel-room"></select>
+        </div>
+
+        <div class="form-group">
+            <label>Nights</label>
+            <input type="number" id="inp-nights" value="3" min="1" max="30" />
+        </div>
+
+        <div class="form-group">
+            <label>Guests</label>
+            <input type="number" id="inp-guests" value="2" min="1" max="10" />
+        </div>
+
+        <div class="form-group">
+            <label>Pricing Strategy</label>
+            <div class="strategy-grid">
+                <label class="strategy-card active" onclick="selectStrategy(this, 'base')">
+                    <input type="radio" name="strategy" value="base" checked />
+                    <div class="strategy-name">📋 Base Price</div>
+                    <div class="strategy-desc">Standard rate, no changes</div>
+                </label>
+                <label class="strategy-card" onclick="selectStrategy(this, 'seasonal')">
+                    <input type="radio" name="strategy" value="seasonal" />
+                    <div class="strategy-name">🌞 Seasonal</div>
+                    <div class="strategy-desc">Peak season +30%</div>
+                </label>
+                <label class="strategy-card" onclick="selectStrategy(this, 'loyalty')">
+                    <input type="radio" name="strategy" value="loyalty" />
+                    <div class="strategy-name">⭐ Loyalty</div>
+                    <div class="strategy-desc">Returning guest -15%</div>
+                </label>
+                <label class="strategy-card" onclick="selectStrategy(this, 'lastminute')">
+                    <input type="radio" name="strategy" value="lastminute" />
+                    <div class="strategy-name">⚡ Last Minute</div>
+                    <div class="strategy-desc">Book now -25%</div>
+                </label>
+            </div>
+        </div>
+
+        <button class="calc-btn" onclick="calculate()">Calculate Price →</button>
+
+        <div class="pattern-info">
+            <strong>📐 Strategy Pattern</strong>
+            Each pricing algorithm is a separate strategy. The calculator doesn't know which formula is used — it just calls Calculate() on whatever strategy is selected.
+        </div>
+    </div>
+
+    <!-- Right: Result -->
+    <div class="panel result-panel">
+        <div class="panel-title">📊 Calculation Result</div>
+        <div id="result-area">
+            <div class="empty-result">
+                👈 Configure your booking<br />and click Calculate
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const hotelsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        hotels.Select(h => new
+        {
+            id = h.Id,
+            rooms = h.RoomTemplates.Select(r => new
+            {
+                type = r.Type.ToString(),
+                name = r.Name,
+                price = r.PricePerNight
+            })
+        })
+    ));
+
+    let selectedStrategy = 'base';
+
+    function updateRooms() {
+        const hotelId = document.getElementById('sel-hotel').value;
+        const hotel = hotelsData.find(h => h.id === hotelId);
+        const sel = document.getElementById('sel-room');
+        sel.innerHTML = hotel.rooms.map(r =>
+            `<option value="${r.type}">${r.name} — ${r.price} EUR/night</option>`
+        ).join('');
+    }
+
+    function selectStrategy(el, value) {
+        document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        selectedStrategy = value;
+    }
+
+    function calculate() {
+        const hotelId = document.getElementById('sel-hotel').value;
+        const roomType = document.getElementById('sel-room').value;
+        const nights = document.getElementById('inp-nights').value;
+        const guests = document.getElementById('inp-guests').value;
+
+        fetch('/Pricing/Calculate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hotelId, roomType, nights, guests, strategy: selectedStrategy })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('result-area').innerHTML =
+                    `<div class="empty-result">⚠️ ${data.error}</div>`;
+                return;
+            }
+
+            document.getElementById('result-area').innerHTML = `
+                <div class="result-card">
+                    <div class="strategy-badge">🎯 ${data.strategyName}</div>
+                    <div class="strategy-info-box">${data.strategyDescription}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title">Breakdown</div>
+                    <div class="result-row">
+                        <span>Base price per night</span>
+                        <span>${data.basePrice} EUR</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Nights</span>
+                        <span>${data.nights}</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Guests</span>
+                        <span>${data.guests}</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Strategy</span>
+                        <span>${data.strategyName}</span>
+                    </div>
+                    <div class="result-total">
+                        <span>Total</span>
+                        <span>${data.total} EUR</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // Инициализация комнат при загрузке
+    updateRooms();
+</script>

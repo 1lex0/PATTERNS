@@ -23,6 +23,7 @@ public class BookingViewModel
         new SelectListItem("Cash", "Cash"),
         new SelectListItem("Crypto", "Crypto"),
         new SelectListItem("Credit", "Credit"),
-        new SelectListItem("Mdl", "Mdl")
+        new SelectListItem("Mdl", "Mdl"),
+        new SelectListItem("PayPal", "PayPal")  
     };
 }

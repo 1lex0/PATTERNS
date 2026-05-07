@@ -10,12 +10,12 @@ namespace PATTERNS.Controllers;
 public class BookingController : Controller
 {
     private readonly IHotelRepository _repo;
-    private readonly BookingService _service;
+    private readonly IBookingFacade _facade;  // Facade вместо кучи зависимостей
 
-    public BookingController(IHotelRepository repo, BookingService service)
+    public BookingController(IHotelRepository repo, IBookingFacade facade)
     {
         _repo = repo;
-        _service = service;
+        _facade = facade;
     }
 
     [HttpGet]
@@ -37,18 +37,21 @@ public class BookingController : Controller
     [HttpPost]
     public IActionResult Index(BookingViewModel vm)
     {
-        // перезаполняем dropdown отелей (иначе пусто после POST)
         vm.Hotels = _repo.GetAllHotels()
             .Select(h => new SelectListItem(h.Name, h.Id))
             .ToList();
 
-        var (booking, message) = _service.CreateBooking(
+        // Facade: ОДИН вызов — внутри: создание брони + оплата + уведомления
+        var guestName = HttpContext.Session.GetString("UserName") ?? "Guest";
+
+        var (booking, message) = _facade.CreateBookingWithNotification(
             vm.HotelId,
             vm.RoomType,
             vm.CheckIn,
             vm.CheckOut,
             vm.Guests,
-            vm.PaymentType
+            vm.PaymentType,
+            guestName
         );
 
         if (booking is null)
@@ -60,7 +63,6 @@ public class BookingController : Controller
 
         ViewBag.MessageTitle = message.Title;
         ViewBag.MessageBody = message.Body;
-
         return View("Result", booking);
     }
 }
